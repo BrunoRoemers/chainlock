@@ -1,5 +1,15 @@
 import { useEffect, useState } from 'react'
 
+export interface Metamask {
+  isMetaMask: true,
+  request: (args: RequestArgs) => Promise<unknown>
+}
+
+export interface RequestArgs {
+  method: string;
+  params?: unknown[] | object;
+}
+
 /**
  * Check if the given object is metamask.
  * @param obj the object that needs to be tested.
@@ -20,8 +30,8 @@ const getMetamaskFromWindow = () => {
  * React hook for getting access to metamask.
  * @returns metamask, or null of not (yet) present.
  */
-const useMetamask = () => {
-  const [ metamask, setMetamask ] = useState(getMetamaskFromWindow());
+const useMetamask = (): Metamask | null => {
+  const [ metamask, setMetamask ] = useState<Metamask | null>(getMetamaskFromWindow());
 
   // listen for async metamask
   // NOTE: this effect is only ran when the component mounts
