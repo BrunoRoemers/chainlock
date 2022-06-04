@@ -1,16 +1,22 @@
 import React from 'react';
-import useMetamask from '../hooks/useMetamask';
+import useAddress from '../hooks/useAddress';
+import useWallet from '../hooks/useWallet';
 
 const Research = () => {
-  const mm = useMetamask();
+  const wallet = useWallet();
+  const address = useAddress(wallet);
 
-  if (mm == null) {
+  if (wallet === null) {
     return (
       <p>waiting for metamask... (<a href='https://metamask.io/'>download</a>)</p>
     )
+  } else if (address === null) {
+    return (
+      <p>TODO connect wallet</p>
+    )
   } else {
     return (
-      <p>research</p>
+      <p>connected: {address}</p>
     );
   }
 }

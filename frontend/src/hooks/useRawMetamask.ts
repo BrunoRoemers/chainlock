@@ -1,13 +1,10 @@
 import { useEffect, useState } from 'react'
 
-export interface Metamask {
+export interface RawMetamask {
   isMetaMask: true,
-  request: (args: RequestArgs) => Promise<unknown>
-}
-
-export interface RequestArgs {
-  method: string;
-  params?: unknown[] | object;
+  request: (args: {method: string, params?: any[]}) => Promise<any>,
+  on: (event: string, callback: (...args: any[]) => void) => void,
+  removeListener: (event: string, callback: (...args: any[]) => void) => void,
 }
 
 /**
@@ -30,14 +27,16 @@ const getMetamaskFromWindow = () => {
  * React hook for getting access to metamask.
  * @returns metamask, or null of not (yet) present.
  */
-const useMetamask = (): Metamask | null => {
-  const [ metamask, setMetamask ] = useState<Metamask | null>(getMetamaskFromWindow());
+const useRawMetamask = (): RawMetamask | null => {
+  // NOTE: getMetamaskFromWindow() will only be called during initial render
+  const [ metamask, setMetamask ] = useState<RawMetamask | null>(() => getMetamaskFromWindow());
 
   // listen for async metamask
   // NOTE: this effect is only ran when the component mounts
   //       and cleaned up when the component unmounts
   //       (empty dependency array)
   useEffect(() => {
+    // NOTE: keep reference to function instance so it can be deregistered
     const listener = () => {
       const mm = getMetamaskFromWindow();
       if (mm !== metamask) {
@@ -55,4 +54,4 @@ const useMetamask = (): Metamask | null => {
   return metamask;
 }
 
-export default useMetamask
+export default useRawMetamask
