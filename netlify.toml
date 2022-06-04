@@ -1,0 +1,13 @@
+[build]
+  # folder in which netlify should look for package.json, site content, etc.
+  base = "frontend/"
+
+  # folder with assets that should be hosted by netlify, i.e. the build output, relative to base
+  publish = "build/"
+
+  # the command to build the site, will be run inside the base folder
+  command = "npm run build"
+
+[functions]
+  # folder that contains netlify functions, relative to base
+  directory = "functions/"
