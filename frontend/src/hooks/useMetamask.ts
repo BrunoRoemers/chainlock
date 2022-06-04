@@ -35,10 +35,12 @@ const useMetamask = () => {
       }
     }
 
-    window.addEventListener('ethereum#initialized', listener);
+    if (metamask === null) {
+      window.addEventListener('ethereum#initialized', listener);
+    }
 
     return () => window.removeEventListener('ethereum#initialized', listener);
-  }, [])
+  }, [metamask])
 
   return metamask;
 }
