@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
  * @param obj the object that needs to be tested.
  * @returns true if the given object is metamask, false otherwise.
  */
-const isMetamask = (obj: any) => typeof obj !== 'undefined' && obj.isMetaMask === true
+const isMetamask = (obj: any) => !!obj && obj.isMetaMask === true
 
 /**
  * Get metamask via the "ethereum" global variable.
