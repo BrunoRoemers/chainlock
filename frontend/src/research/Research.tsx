@@ -10,7 +10,7 @@ const Research = () => {
   const address = useAddress(wallet);
   const pkb64 = usePublicKeyBase64(wallet, address);
 
-  const [ message, setMessage ] = useState<string>('hello world')
+  const [ message ] = useState<string>('hello world')
   const [ encryptedData, setEncryptedData ] = useState<EthEncryptedData | null>(null)
   const [ decryptedData, setDecryptedData ] = useState<string | null>(null)
 
