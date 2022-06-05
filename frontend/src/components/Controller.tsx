@@ -47,7 +47,7 @@ const Controller = () => {
     <div>
       <div>hello <Address>{address}</Address></div>
       <div>
-        you're looking at vault: <Address>{currentVaultAddress}</Address>
+        you're looking at vault: <Address named>{currentVaultAddress}</Address>
         {' '}
         <Button onClick={() => setCurrentVaultAddress(null)}>select different vault</Button>
       </div>

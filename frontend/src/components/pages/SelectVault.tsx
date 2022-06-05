@@ -32,7 +32,7 @@ const SelectVault = ({address, vaultAddresses, onSelect}: Props) => {
           <option disabled={true}>{CHOOSE_A_VAULT}</option>
           {vaultAddresses.map(vaultAddress => (
             <option key={vaultAddress} value={vaultAddress}>
-              DAO Brussels (<Address plainText={true}>{vaultAddress}</Address>)
+              <Address plainText={true} named={true}>{vaultAddress}</Address>
             </option>
           ))}
         </select>
