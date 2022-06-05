@@ -1,6 +1,15 @@
+import Frame from "../atoms/Frame"
+import FrameLogo from "../atoms/FrameLogo"
+import FrameMessage from "../atoms/FrameMessage"
+
 const FirstVault = () => {
   return (
-    <p>create or join your first vault</p>
+    <Frame>
+      <FrameLogo/>
+      <FrameMessage>
+        <p>[TODO] create or join your first vault</p>
+      </FrameMessage>
+    </Frame>
   )
 }
 
