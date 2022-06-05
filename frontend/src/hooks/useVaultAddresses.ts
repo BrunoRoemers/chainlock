@@ -10,7 +10,8 @@ const addressTofakeVaultAddresses: {[address: string]: string[]} = {
     '0x20595033332Ff63968a62a3C678e63fd46E7e534',
     '0xd013ef6fece839223cf9ebfb6b86be70fa2b1994',
     '0xd410682bc60d8a85f022440874c0d86e3ae6bbf7'
-  ]
+  ],
+  '0x9cedf9e8358f18567ee0e72558ed86c84f2238a8': []
 }
 
 // TODO implement
@@ -24,7 +25,13 @@ const useVaultAddresses = (wallet: Wallet | null, address: string | null) => {
       if (fakeVaultAddresses) {
         setVaultAddresses(fakeVaultAddresses)
       } else {
-        setVaultAddresses([])
+        setVaultAddresses([
+          // TODO some addresses that everyone can see...
+          '0x6d6faa770073810629c63729a6e428c46b9e0cd4',
+          '0xb05b34b3ca20660ee00e679c9ab20c09eb4e68a1',
+          '0x07721f699a1f434983b2c15db719e6d235ba936e',
+          '0x32c0edf1a4d69db492b17341764d041ddb643016'
+        ])
       }
     }
   }, [wallet, address])
