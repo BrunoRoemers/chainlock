@@ -1,17 +1,45 @@
-import React from 'react';
+import { EthEncryptedData } from '@metamask/eth-sig-util';
+import React, { useEffect, useState } from 'react';
 import WalletButton from '../components/WalletButton';
 import useAddress from '../hooks/useAddress';
+import usePublicKeyBase64 from '../hooks/usePublicKeyBase64';
 import useWallet from '../hooks/useWallet';
 
 const Research = () => {
   const wallet = useWallet();
   const address = useAddress(wallet);
+  const pkb64 = usePublicKeyBase64(wallet, address);
 
-  // TODO temp
-  // if (wallet && address) {
-  //   console.log('address', address)
-  //   wallet.encryptWithPublicKey(address, 'asdf')
-  // }
+  const [ message, setMessage ] = useState<string>('hello world')
+  const [ encryptedData, setEncryptedData ] = useState<EthEncryptedData | null>(null)
+  const [ decryptedData, setDecryptedData ] = useState<string | null>(null)
+
+  useEffect(() => {
+    (async () => {
+      if (wallet && pkb64) {
+        setEncryptedData(
+          await wallet.encryptWithPublicKey(pkb64, message)
+        )
+      }
+    })()
+  }, [wallet, pkb64, message])
+
+  useEffect(() => {
+    (async () => {
+      if (wallet && address && encryptedData) {
+        setDecryptedData(
+          await wallet.decryptWithPrivateKey(address, encryptedData)
+        )
+      }
+    })()
+  }, [wallet, address, encryptedData])
+
+  console.log('wallet', wallet);
+  console.log('address', address);
+  console.log('pkb64', pkb64);
+  console.log('message', message);
+  console.log('encrypted data', encryptedData);
+  console.log('decrypted data', decryptedData);
 
   if (wallet === null) {
     return (

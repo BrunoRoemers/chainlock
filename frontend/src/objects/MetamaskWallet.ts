@@ -1,4 +1,4 @@
-import { encryptSafely } from "@metamask/eth-sig-util";
+import { encrypt, EthEncryptedData } from "@metamask/eth-sig-util";
 import { RawMetamask } from "../hooks/useRawMetamask";
 import Ref from "./Ref";
 import Wallet from "./Wallet.interface";
@@ -50,27 +50,28 @@ export default class MetamaskWallet implements Wallet {
     })
   }
 
-  async encryptWithPublicKey(address: string, message: string): Promise<string> {
-    // TODO
-    const pkb64 = await this.getPublicKeyBase64(address)
-
-    // TODO this makes the app crash, configure node.js polyfills via webpack
-    const enc = encryptSafely({
-      publicKey: pkb64,
+  async encryptWithPublicKey(publicKeyBase64: string, message: string): Promise<EthEncryptedData> {
+    const encryptedData = encrypt({
+      publicKey: publicKeyBase64,
       data: message,
       version: 'x25519-xsalsa20-poly1305'
     })
-
-    console.log('enc', enc)
-
-    console.log('pkb64', pkb64)
-
-    return Promise.resolve('TODO');
+    return Promise.resolve(encryptedData);
   }
 
-  decryptWithPrivateKey(address: string, cyphertext: string): Promise<string> {
-    // TODO
-    return Promise.resolve('TODO');
+  private encryptedDataToHexString(encryptedData: EthEncryptedData): string {
+    return `0x${Buffer.from(JSON.stringify(encryptedData), 'utf8').toString('hex')}`;
+  }
+
+  async decryptWithPrivateKey(address: string, encryptedData: EthEncryptedData): Promise<string> {
+    const message = await this.mm.request({
+      method: 'eth_decrypt',
+      params: [
+        this.encryptedDataToHexString(encryptedData),
+        address
+      ]
+    })
+    return Promise.resolve(message);
   }
 
 

@@ -1,3 +1,5 @@
+import { EthEncryptedData } from "@metamask/eth-sig-util";
+
 export default interface Wallet {
 
   /**
@@ -29,9 +31,9 @@ export default interface Wallet {
   getPublicKeyBase64(address: string): Promise<string>;
 
   // TODO
-  encryptWithPublicKey(address: string, message: string): Promise<string>;
+  encryptWithPublicKey(publicKeyBase64: string, message: string): Promise<EthEncryptedData>;
 
   // TODO
-  decryptWithPrivateKey(address: string, cyphertext: string): Promise<string>;
+  decryptWithPrivateKey(address: string, encryptedData: EthEncryptedData): Promise<string>;
   
 }
