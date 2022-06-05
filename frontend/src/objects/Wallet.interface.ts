@@ -24,5 +24,14 @@ export default interface Wallet {
    * @param callback the function. 
    */
   removeAddressChangeListener(callback: (newAddress: string | null) => void): void
+
+  // TODO
+  getPublicKeyBase64(address: string): Promise<string>;
+
+  // TODO
+  encryptWithPublicKey(address: string, message: string): Promise<string>;
+
+  // TODO
+  decryptWithPrivateKey(address: string, cyphertext: string): Promise<string>;
   
 }

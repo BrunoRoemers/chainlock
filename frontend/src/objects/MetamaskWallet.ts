@@ -1,3 +1,4 @@
+import { encryptSafely } from "@metamask/eth-sig-util";
 import { RawMetamask } from "../hooks/useRawMetamask";
 import Ref from "./Ref";
 import Wallet from "./Wallet.interface";
@@ -41,6 +42,37 @@ export default class MetamaskWallet implements Wallet {
       this.mm.removeListener('accountsChanged', outerCallback);
     }
   }
+
+  async getPublicKeyBase64(address: string): Promise<string> {
+    return await this.mm.request({
+      method: 'eth_getEncryptionPublicKey',
+      params: [address]
+    })
+  }
+
+  async encryptWithPublicKey(address: string, message: string): Promise<string> {
+    // TODO
+    const pkb64 = await this.getPublicKeyBase64(address)
+
+    // TODO this makes the app crash, configure node.js polyfills via webpack
+    const enc = encryptSafely({
+      publicKey: pkb64,
+      data: message,
+      version: 'x25519-xsalsa20-poly1305'
+    })
+
+    console.log('enc', enc)
+
+    console.log('pkb64', pkb64)
+
+    return Promise.resolve('TODO');
+  }
+
+  decryptWithPrivateKey(address: string, cyphertext: string): Promise<string> {
+    // TODO
+    return Promise.resolve('TODO');
+  }
+
 
   getMetamaskObj(): RawMetamask {
     return this.mm;
