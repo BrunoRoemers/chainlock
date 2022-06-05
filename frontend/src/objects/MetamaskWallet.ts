@@ -8,6 +8,11 @@ export default class MetamaskWallet implements Wallet {
     private mm: RawMetamask
   ) {}
 
+  async requestAddressAccess(): Promise<string | null> {
+    const r = await this.mm.request({ method: 'eth_requestAccounts' });
+    return r.length <= 0 ? null : r[0]
+  }
+
   async getCurrentAddress(): Promise<string | null> {
     const r = await this.mm.request({method: 'eth_accounts'})
     return r.length <= 0 ? null : r[0]

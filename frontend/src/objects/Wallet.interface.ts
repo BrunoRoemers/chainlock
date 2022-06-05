@@ -1,6 +1,11 @@
 export default interface Wallet {
 
   /**
+   * Request an address from the wallet.
+   */
+  requestAddressAccess(): Promise<string | null>
+
+  /**
    * Get the address that's currently in use (if any).
    */
   getCurrentAddress(): Promise<string | null>
