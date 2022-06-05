@@ -1,6 +1,6 @@
 import { EthEncryptedData } from '@metamask/eth-sig-util';
 import React, { useEffect, useState } from 'react';
-import WalletButton from '../components/WalletButton';
+import WalletButton from '../components/molecules/WalletButton';
 import useAddress from '../hooks/useAddress';
 import usePublicKeyBase64 from '../hooks/usePublicKeyBase64';
 import useWallet from '../hooks/useWallet';

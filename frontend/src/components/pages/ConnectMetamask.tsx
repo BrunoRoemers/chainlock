@@ -1,11 +1,20 @@
-import Frame from "../Frame"
-import FrameLogo from "../FrameLogo"
+import Wallet from "../../objects/Wallet.interface"
+import Frame from "../atoms/Frame"
+import FrameLogo from "../atoms/FrameLogo"
+import FrameMessage from "../atoms/FrameMessage"
+import WalletButton from "../molecules/WalletButton"
 
-const ConnectMetamask = () => {
+interface Props {
+  wallet: Wallet
+}
+
+const ConnectMetamask = ({wallet}: Props) => {
   return (
     <Frame>
       <FrameLogo/>
-      <p>connect metamask</p>
+      <FrameMessage>
+        <WalletButton wallet={wallet}/>
+      </FrameMessage>
     </Frame>
   )
 }

@@ -2,6 +2,7 @@ import { useState } from "react"
 import useAddress from "../hooks/useAddress"
 import useVaultAddresses from "../hooks/useVaultAddresses"
 import useWallet from "../hooks/useWallet"
+import WalletButton from "./molecules/WalletButton"
 import ConnectMetamask from "./pages/ConnectMetamask"
 import FirstVault from "./pages/FirstVault"
 import InstallMetamask from "./pages/InstallMetamask"
@@ -21,7 +22,7 @@ const Controller = () => {
 
   if (address === null) {
     return (
-      <ConnectMetamask/>
+      <ConnectMetamask wallet={wallet}/>
     )
   }
 

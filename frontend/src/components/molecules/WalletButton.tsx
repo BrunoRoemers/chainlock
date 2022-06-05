@@ -1,6 +1,7 @@
 import { useState } from "react";
-import useAddress from "../hooks/useAddress";
-import Wallet from "../objects/Wallet.interface"
+import useAddress from "../../hooks/useAddress";
+import Wallet from "../../objects/Wallet.interface"
+import Button from "../atoms/Button";
 
 interface Props {
   wallet: Wallet
@@ -16,14 +17,20 @@ const WalletButton = ({ wallet }: Props) => {
   }
 
   const renderButton = () => (
-    <button disabled={isDisabled} onClick={handleClick}>connect metamask</button>
+    <Button disabled={isDisabled} onClick={handleClick}>connect metamask</Button>
+  )
+
+  const renderWaiting = () => (
+    <Button disabled={true}>waiting...</Button>
   )
 
   const renderConnected = () => (
-    <p>connected: {address}</p>
+    <Button disabled={true}>connected: {address}</Button>
   )
 
-  if (address === null) {
+  if (isDisabled === true) {
+    return renderWaiting();
+  } else if (address === null) {
     return renderButton();
   } else {
     return renderConnected();
