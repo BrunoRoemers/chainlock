@@ -1,19 +1,19 @@
 import { useState } from "react";
-import useAddress from "../../hooks/useAddress";
 import Wallet from "../../objects/Wallet.interface"
 import Address from "../atoms/Address";
 import Button from "../atoms/Button";
 
 interface Props {
   wallet: Wallet
+  address?: string 
 }
 
-const WalletButton = ({ wallet }: Props) => {
-  const address = useAddress(wallet);
+const WalletButton = ({ wallet, address }: Props) => {
   const [ isDisabled, setIsDisabled ] = useState(false);
 
   const handleClick = () => {
     setIsDisabled(true)
+    // TODO address needs to be set again in the parent component
     wallet.requestAddressAccess().finally(() => setIsDisabled(false))
   }
 

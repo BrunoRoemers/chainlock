@@ -14,7 +14,7 @@ interface ExportedKeyPair {
 
 const Research = () => {
   const wallet = useWallet();
-  const address = useAddress(wallet);
+  const [ address ] = useAddress(wallet);
   const walletPublicKeyBase64 = usePublicKeyBase64(wallet, address);
 
   const [ vaultKeyPair, setExportedKeyPair ] = useState<ExportedKeyPair | undefined>()
@@ -82,7 +82,7 @@ const Research = () => {
   }
 
   return (
-    <WalletButton wallet={wallet}/>
+    <WalletButton wallet={wallet} address={address}/>
   )
 }
 

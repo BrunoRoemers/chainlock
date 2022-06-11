@@ -19,6 +19,7 @@ const useVaultAddresses = (wallet: Wallet | undefined, address: string | undefin
   const [ vaultAddresses, setVaultAddresses ] = useState<string[]>([])
 
   // TODO temp
+  // find all vaults in which the user takes part...
   useEffect(() => {
     if (wallet && address) {
       const fakeVaultAddresses = addressTofakeVaultAddresses[address]
@@ -33,6 +34,13 @@ const useVaultAddresses = (wallet: Wallet | undefined, address: string | undefin
           '0x32c0edf1a4d69db492b17341764d041ddb643016'
         ])
       }
+    }
+  }, [wallet, address])
+
+  // unset the vault addresses
+  useEffect(() => {
+    if (!wallet || !address) {
+      setVaultAddresses([])
     }
   }, [wallet, address])
 

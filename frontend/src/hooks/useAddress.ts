@@ -6,7 +6,7 @@ import Wallet from "../objects/Wallet.interface";
  * @param wallet the wallet.
  * @returns an ethereum address, or undefined.
  */
-const useAddress = (wallet: Wallet | undefined): string | undefined => {
+const useAddress = (wallet: Wallet | undefined): [string | undefined, (address: string | undefined) => void] => {
   const [address, setAddress] = useState<string | undefined>();
 
   // populate address when metamask loads
@@ -30,7 +30,7 @@ const useAddress = (wallet: Wallet | undefined): string | undefined => {
     }
   }, [wallet])
 
-  return address;
+  return [address, setAddress];
 }
 
 export default useAddress

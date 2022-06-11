@@ -4,8 +4,7 @@ import useCurrentVaultAddress from "../hooks/useCurrentVaultAddress"
 import useVaultAddresses from "../hooks/useVaultAddresses"
 import useVaultKeyPair from "../hooks/useVaultKeyPair"
 import useWallet from "../hooks/useWallet"
-import Address from "./atoms/Address"
-import Button from "./atoms/Button"
+import Dashboard from "./Dashboard"
 import ConnectMetamask from "./pages/ConnectMetamask"
 import FirstVault from "./pages/FirstVault"
 import InstallMetamask from "./pages/InstallMetamask"
@@ -14,7 +13,8 @@ import WaitOnVaultPrivateKeyDecrypt from "./pages/WaitOnVaultPrivateKeyDecrypt"
 
 const Controller = () => {
   const wallet = useWallet()
-  const address = useAddress(wallet)
+  const [ address, setAddress ] = useAddress(wallet)
+  const disconnectWallet = useCallback(() => setAddress(undefined), [setAddress])
   const vaultAddresses = useVaultAddresses(wallet, address)
   const [ currentVaultAddress, setCurrentVaultAddress ] = useCurrentVaultAddress(address, vaultAddresses)
   const goToVaultSelect = useCallback(() => setCurrentVaultAddress(undefined), [setCurrentVaultAddress])
@@ -28,7 +28,10 @@ const Controller = () => {
 
   if (!address) {
     return (
-      <ConnectMetamask wallet={wallet}/>
+      <ConnectMetamask
+        wallet={wallet}
+        address={address}
+      />
     )
   }
 
@@ -57,14 +60,14 @@ const Controller = () => {
   }
 
   return (
-    <div>
-      <div>hello <Address>{address}</Address></div>
-      <div>
-        you're looking at vault: <Address named>{currentVaultAddress}</Address>
-        {' '}
-        <Button onClick={() => goToVaultSelect()}>select different vault</Button>
-      </div>
-    </div>
+    <Dashboard
+      wallet={wallet}
+      address={address}
+      vaultAddress={currentVaultAddress}
+      vaultKeyPair={vaultKeyPair}
+      goToVaultSelect={goToVaultSelect}
+      disconnectWallet={disconnectWallet}
+    />
   )
 }
 

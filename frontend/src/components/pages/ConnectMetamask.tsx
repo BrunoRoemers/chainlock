@@ -6,14 +6,15 @@ import WalletButton from "../molecules/WalletButton"
 
 interface Props {
   wallet: Wallet
+  address?: string
 }
 
-const ConnectMetamask = ({wallet}: Props) => {
+const ConnectMetamask = ({wallet, address}: Props) => {
   return (
     <Frame>
       <FrameLogo/>
       <FrameMessage>
-        <WalletButton wallet={wallet}/>
+        <WalletButton wallet={wallet} address={address}/>
       </FrameMessage>
     </Frame>
   )
