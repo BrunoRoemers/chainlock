@@ -14,17 +14,17 @@ afterEach(() => {
   jest.restoreAllMocks()
 })
 
-test('when current address = null, useAddress hook should return null on load', async () => {
+test('when current address = undefined, useAddress hook should return undefined on load', async () => {
   const metamaskMock = getMetamaskMock();
   const wallet = new MetamaskWallet(metamaskMock as RawMetamask);
   const walletSpy = jest.spyOn(wallet, 'getCurrentAddress');
 
-  walletSpy.mockImplementation(() => Promise.resolve(null))
+  walletSpy.mockImplementation(() => Promise.resolve(undefined))
 
   const { result } = renderHook(() => useAddress(wallet));
 
   await waitFor(() => {
-    expect(result.current).toBe(null)
+    expect(result.current).toBe(undefined)
   })
 })
 

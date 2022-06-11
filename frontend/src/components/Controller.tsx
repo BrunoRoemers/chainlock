@@ -17,7 +17,7 @@ const Controller = () => {
   const address = useAddress(wallet)
   const vaultAddresses = useVaultAddresses(wallet, address)
   const [ currentVaultAddress, setCurrentVaultAddress ] = useCurrentVaultAddress(address, vaultAddresses)
-  const goToVaultSelect = useCallback(() => setCurrentVaultAddress(null), [setCurrentVaultAddress])
+  const goToVaultSelect = useCallback(() => setCurrentVaultAddress(undefined), [setCurrentVaultAddress])
   const { vaultKeyPair } = useVaultKeyPair(wallet, address, currentVaultAddress, { onDialogCancel: goToVaultSelect })
 
   if (!wallet) {

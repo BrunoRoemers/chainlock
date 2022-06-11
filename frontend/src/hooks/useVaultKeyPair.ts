@@ -18,9 +18,9 @@ interface Return {
 }
 
 const useVaultKeyPair = (
-  wallet: Wallet | null,
-  address: string | null, 
-  vaultAddress: string | null,
+  wallet: Wallet | undefined,
+  address: string | undefined, 
+  vaultAddress: string | undefined,
   options?: Options
 ): Return => {
   // TODO 1. access the vault smart contract

@@ -15,7 +15,7 @@ const addressTofakeVaultAddresses: {[address: string]: string[]} = {
 }
 
 // TODO implement
-const useVaultAddresses = (wallet: Wallet | null, address: string | null) => {
+const useVaultAddresses = (wallet: Wallet | undefined, address: string | undefined) => {
   const [ vaultAddresses, setVaultAddresses ] = useState<string[]>([])
 
   // TODO temp

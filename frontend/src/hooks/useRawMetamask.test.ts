@@ -37,14 +37,14 @@ test('useRawMetamask hook should detect metamask asynchronously', async () => {
   const { result } = renderHook(() => useRawMetamask());
 
   // window.ethereum is not yet present
-  expect(result.current).toBeNull();
+  expect(result.current).toBeUndefined();
 
   act(() => {
     window.dispatchEvent(new window.Event('ethereum#initialized'));
   })
 
   // window.ethereum is not yet present, triggering the event does not change a thing
-  expect(result.current).toBeNull();
+  expect(result.current).toBeUndefined();
 
   const metamaskMock = { isMetaMask: true }
   act(() => {
@@ -52,7 +52,7 @@ test('useRawMetamask hook should detect metamask asynchronously', async () => {
   })
 
   // window.ethereum is present, but the event is not triggered yet
-  expect(result.current).toBeNull();
+  expect(result.current).toBeUndefined();
 
   act(() => {
     window.dispatchEvent(new window.Event('ethereum#initialized'));

@@ -16,20 +16,20 @@ const isMetamask = (obj: any) => !!obj && obj.isMetaMask === true
 
 /**
  * Get metamask via the "ethereum" global variable.
- * @returns the metamask object, or null if not found.
+ * @returns the metamask object, or undefined if not found.
  */
-const getMetamaskFromWindow = () => {
+const getMetamaskFromWindow = (): RawMetamask | undefined => {
   const { ethereum } = window as any;
-  return isMetamask(ethereum) ? ethereum : null;
+  return isMetamask(ethereum) ? ethereum : undefined;
 }
 
 /**
  * React hook for getting access to metamask.
- * @returns metamask, or null of not (yet) present.
+ * @returns metamask, or undefined if not (yet) present.
  */
-const useRawMetamask = (): RawMetamask | null => {
+const useRawMetamask = (): RawMetamask | undefined => {
   // NOTE: getMetamaskFromWindow() will only be called during initial render
-  const [ metamask, setMetamask ] = useState<RawMetamask | null>(() => getMetamaskFromWindow());
+  const [ metamask, setMetamask ] = useState<RawMetamask | undefined>(() => getMetamaskFromWindow());
 
   // listen for async metamask
   // NOTE: this effect is only ran when the component mounts
@@ -44,7 +44,7 @@ const useRawMetamask = (): RawMetamask | null => {
       }
     }
 
-    if (metamask === null) {
+    if (!metamask) {
       window.addEventListener('ethereum#initialized', listener);
     }
 

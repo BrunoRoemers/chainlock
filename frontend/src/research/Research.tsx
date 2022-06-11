@@ -17,9 +17,9 @@ const Research = () => {
   const address = useAddress(wallet);
   const walletPublicKeyBase64 = usePublicKeyBase64(wallet, address);
 
-  const [ vaultKeyPair, setExportedKeyPair ] = useState<ExportedKeyPair | null>(null)
-  const [ vaultEncryptedPrivateKey, setVaultEncryptedPrivateKey ] = useState<EthEncryptedData | null>(null)
-  const [ vaultDecryptedPrivateKey, setVaultDecryptedPrivateKey ] = useState<string | null>(null)
+  const [ vaultKeyPair, setExportedKeyPair ] = useState<ExportedKeyPair | undefined>()
+  const [ vaultEncryptedPrivateKey, setVaultEncryptedPrivateKey ] = useState<EthEncryptedData | undefined>()
+  const [ vaultDecryptedPrivateKey, setVaultDecryptedPrivateKey ] = useState<string | undefined>()
 
   // generate an RSA key pair on load
   useEffect(() => {
@@ -75,7 +75,7 @@ const Research = () => {
   console.log('vaultEncryptedPrivateKey', vaultEncryptedPrivateKey);
   console.log('vaultDecryptedPrivateKey', vaultDecryptedPrivateKey);
 
-  if (wallet === null) {
+  if (!wallet) {
     return (
       <p>waiting for metamask... (<a href='https://metamask.io/'>download</a>)</p>
     )

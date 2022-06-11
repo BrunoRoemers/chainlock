@@ -3,20 +3,20 @@ import MetamaskWallet from "../objects/MetamaskWallet";
 import Wallet from "../objects/Wallet.interface";
 import useRawMetamask, { RawMetamask } from "./useRawMetamask"
 
-const wrapInWallet = (obj: RawMetamask | null) => obj === null ? null : new MetamaskWallet(obj);
+const wrapInWallet = (obj: RawMetamask | undefined) => obj && new MetamaskWallet(obj);
 
-const getRawMetamask = (mm: MetamaskWallet | null) => mm === null ? null : mm.getMetamaskObj();
+const getRawMetamask = (mm: MetamaskWallet | undefined) => mm?.getMetamaskObj();
 
 /**
  * React hook for getting a {@link Wallet} instance.
  * Currently only supports metamask as wallet provider.
- * @returns a wallet or null.
+ * @returns a wallet or undefined.
  */
-const useWallet = (): Wallet | null => {
+const useWallet = (): Wallet | undefined => {
   const rawMetamask = useRawMetamask();
   
   // NOTE: wrapInWallet() will only be called during initial render
-  const [ wallet, setWallet ] = useState<MetamaskWallet | null>(() => wrapInWallet(rawMetamask));
+  const [ wallet, setWallet ] = useState<MetamaskWallet | undefined>(() => wrapInWallet(rawMetamask));
 
   // create a new wallet object whenever rawMetamask changes
   if (rawMetamask !== getRawMetamask(wallet)) {

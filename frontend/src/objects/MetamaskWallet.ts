@@ -9,24 +9,24 @@ export default class MetamaskWallet implements Wallet {
     private mm: RawMetamask
   ) {}
 
-  async requestAddressAccess(): Promise<string | null> {
+  async requestAddressAccess(): Promise<string | undefined> {
     const r = await this.mm.request({ method: 'eth_requestAccounts' });
-    return r.length <= 0 ? null : r[0]
+    return r.length <= 0 ? undefined : r[0]
   }
 
-  async getCurrentAddress(): Promise<string | null> {
+  async getCurrentAddress(): Promise<string | undefined> {
     const r = await this.mm.request({method: 'eth_accounts'})
-    return r.length <= 0 ? null : r[0]
+    return r.length <= 0 ? undefined : r[0]
   }
 
   private onAccountsChangedRefs = new Ref<
-    (newAddress: string | null) => void,
+    (newAddress: string | undefined) => void,
     (r: string[]) => void
   >();
 
-  onAddressChange(innerCallback: (newAddress: string | null) => void): void {
+  onAddressChange(innerCallback: (newAddress: string | undefined) => void): void {
     const outerCallback = (r: string[]) => {
-      const newAddress = r.length <= 0 ? null : r[0]
+      const newAddress = r.length <= 0 ? undefined : r[0]
       innerCallback(newAddress);
     }
 
@@ -35,7 +35,7 @@ export default class MetamaskWallet implements Wallet {
     this.mm.on('accountsChanged', outerCallback)
   }
 
-  removeAddressChangeListener(innerCallback: (newAddress: string | null) => void): void {
+  removeAddressChangeListener(innerCallback: (newAddress: string | undefined) => void): void {
     const outerCallback = this.onAccountsChangedRefs.getAndRemove(innerCallback);
 
     if (outerCallback !== undefined) {
