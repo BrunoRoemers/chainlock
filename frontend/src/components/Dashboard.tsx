@@ -22,7 +22,7 @@ const Dashboard = ({
         onChangeVault={goToVaultSelect}
       />
       <div>
-        TODO
+        TODO: here you'll be able to store passwords in Chainlock, view them and share them with other people (addresses) in the vault.
       </div>
     </div>
   )
