@@ -10,7 +10,7 @@ export default class MetamaskWallet implements Wallet {
   ) {}
 
   async requestAddressAccess(): Promise<string | undefined> {
-    const r = await this.mm.request({ method: 'eth_requestAccounts' });
+    const r = await this.mm.request({ method: 'eth_requestAccounts' })
     return r.length <= 0 ? undefined : r[0]
   }
 

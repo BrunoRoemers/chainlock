@@ -14,6 +14,7 @@ import WaitOnVaultPrivateKeyDecrypt from "./pages/WaitOnVaultPrivateKeyDecrypt"
 const Controller = () => {
   const wallet = useWallet()
   const [ address, setAddress ] = useAddress(wallet)
+  const connectWallet = useCallback((newAddress: string) => setAddress(newAddress), [setAddress])
   const disconnectWallet = useCallback(() => setAddress(undefined), [setAddress])
   const vaultAddresses = useVaultAddresses(wallet, address)
   const [ currentVaultAddress, setCurrentVaultAddress ] = useCurrentVaultAddress(address, vaultAddresses)
@@ -30,7 +31,8 @@ const Controller = () => {
     return (
       <ConnectMetamask
         wallet={wallet}
-        address={address}
+        connectedAddress={address}
+        onConnect={(newAddress?: string) => newAddress && connectWallet(newAddress)}
       />
     )
   }

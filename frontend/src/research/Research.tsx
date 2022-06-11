@@ -82,7 +82,7 @@ const Research = () => {
   }
 
   return (
-    <WalletButton wallet={wallet} address={address}/>
+    <WalletButton wallet={wallet} connectedAddress={address}/>
   )
 }
 
