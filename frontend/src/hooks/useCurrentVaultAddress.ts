@@ -6,7 +6,11 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react"
  * @param vaultAddresses the list of vaults in which the user participates.
  * @returns the address of the vault that's currently active, or undefined if no vault is currently active.
  */
-const useCurrentVaultAddress = (address: string | undefined, vaultAddresses: string[]): [string | undefined, Dispatch<SetStateAction<string | undefined>>] => {
+const useCurrentVaultAddress = (
+  address: string | undefined,
+  vaultAddresses: string[],
+  autoSelectOneAndOnly: boolean = false
+): [string | undefined, Dispatch<SetStateAction<string | undefined>>] => {
   const [currentVaultAddress, setCurrentVaultAddress] = useState<string | undefined>()
   
   // reset the current vault address when the user changes
@@ -16,10 +20,10 @@ const useCurrentVaultAddress = (address: string | undefined, vaultAddresses: str
   
   // auto-select vault if it's the only one
   useEffect(() => {
-    if (vaultAddresses.length === 1) {
+    if (autoSelectOneAndOnly && vaultAddresses.length === 1) {
       setCurrentVaultAddress(vaultAddresses[0])
     }
-  }, [vaultAddresses])
+  }, [autoSelectOneAndOnly, vaultAddresses])
 
   return [currentVaultAddress, setCurrentVaultAddress]
 }
