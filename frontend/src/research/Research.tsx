@@ -4,42 +4,76 @@ import WalletButton from '../components/molecules/WalletButton';
 import useAddress from '../hooks/useAddress';
 import usePublicKeyBase64 from '../hooks/usePublicKeyBase64';
 import useWallet from '../hooks/useWallet';
+import exportPrivateKeyBase64 from '../utils/crypto/exportPrivateKeyBase64';
+import exportPublicKeyBase64 from '../utils/crypto/exportPublicKeyBase64';
+
+interface ExportedKeyPair {
+  privateKey: string
+  publicKey: string
+}
 
 const Research = () => {
   const wallet = useWallet();
   const address = useAddress(wallet);
-  const pkb64 = usePublicKeyBase64(wallet, address);
+  const walletPublicKeyBase64 = usePublicKeyBase64(wallet, address);
 
-  const [ message ] = useState<string>('hello world')
-  const [ encryptedData, setEncryptedData ] = useState<EthEncryptedData | null>(null)
-  const [ decryptedData, setDecryptedData ] = useState<string | null>(null)
+  const [ vaultKeyPair, setExportedKeyPair ] = useState<ExportedKeyPair | null>(null)
+  const [ vaultEncryptedPrivateKey, setVaultEncryptedPrivateKey ] = useState<EthEncryptedData | null>(null)
+  const [ vaultDecryptedPrivateKey, setVaultDecryptedPrivateKey ] = useState<string | null>(null)
 
+  // generate an RSA key pair on load
   useEffect(() => {
     (async () => {
-      if (wallet && pkb64) {
-        setEncryptedData(
-          await wallet.encryptWithPublicKey(pkb64, message)
+      const kp = await window.crypto.subtle.generateKey({
+        name: "RSA-OAEP",
+        modulusLength: 4096,
+        publicExponent: new Uint8Array([1, 0, 1]),
+        hash: "SHA-256"
+      }, true, ["encrypt", "decrypt"])
+
+      const privateKeyBase64 = await exportPrivateKeyBase64(kp);
+      const publicKeyBase64 = await exportPublicKeyBase64(kp);
+
+      setExportedKeyPair({
+        privateKey: privateKeyBase64,
+        publicKey: publicKeyBase64,
+      })
+    })()
+  }, [])
+
+  // simulate joining a vault
+  useEffect(() => {
+    (async () => {
+      if (wallet && walletPublicKeyBase64 && vaultKeyPair) {
+        console.log("ENCRYPTING...")
+        setVaultEncryptedPrivateKey(
+          // NOTE: encrypt the private key of the vault with the public key of the wallet
+          //       => the result can safely be stored on-chain
+          //       => at a later date, the result can be downloaded and decrypted with the wallet
+          //       => access to vault
+          await wallet.encryptWithPublicKey(walletPublicKeyBase64, vaultKeyPair.privateKey)
         )
       }
     })()
-  }, [wallet, pkb64, message])
+  }, [wallet, walletPublicKeyBase64, vaultKeyPair])
 
+  // simulating unlocking the vault at a later date
   useEffect(() => {
     (async () => {
-      if (wallet && address && encryptedData) {
-        setDecryptedData(
-          await wallet.decryptWithPrivateKey(address, encryptedData)
+      if (wallet && address && vaultEncryptedPrivateKey) {
+        setVaultDecryptedPrivateKey(
+          await wallet.decryptWithPrivateKey(address, vaultEncryptedPrivateKey)
         )
       }
     })()
-  }, [wallet, address, encryptedData])
+  }, [wallet, address, vaultEncryptedPrivateKey])
 
   console.log('wallet', wallet);
   console.log('address', address);
-  console.log('pkb64', pkb64);
-  console.log('message', message);
-  console.log('encrypted data', encryptedData);
-  console.log('decrypted data', decryptedData);
+  console.log('walletPublicKeyBase64', walletPublicKeyBase64);
+  console.log('vaultKeyPair', vaultKeyPair);
+  console.log('vaultEncryptedPrivateKey', vaultEncryptedPrivateKey);
+  console.log('vaultDecryptedPrivateKey', vaultDecryptedPrivateKey);
 
   if (wallet === null) {
     return (
