@@ -22,10 +22,10 @@ const SelectVault = ({address, vaultAddresses, onSelect}: Props) => {
     <Frame>
       <FrameLogo/>
       <FrameMessage>
-        <p>Hi, <Address>{address}</Address> 👋</p>
-        <p>select which vault to use</p>
+        <p>Hi, <Address named>{address}</Address> 👋</p>
+        <p className="mt-2">Select which vault to use:</p>
         <select
-          className="mt-2 bg-white rounded-md px-2 py-1 min-w-[50%] max-w-full font-mono"
+          className="mt-6 bg-white rounded-md px-2 py-1 min-w-[50%] max-w-full font-mono"
           onChange={onChange}
           defaultValue={CHOOSE_A_VAULT}
         >
@@ -36,6 +36,7 @@ const SelectVault = ({address, vaultAddresses, onSelect}: Props) => {
             </option>
           ))}
         </select>
+        <p className="mt-6 text-gray-600">Next, Metamask will ask you to decrypt the vault.</p>
       </FrameMessage>
     </Frame>
   )

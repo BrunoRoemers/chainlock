@@ -20,7 +20,7 @@ const WalletButton = ({ wallet }: Props) => {
   if (isDisabled === true) {
     return <Button disabled={true}>waiting...</Button>
   } else if (address === null) {
-    return <Button disabled={isDisabled} onClick={handleClick}>connect metamask</Button>
+    return <Button disabled={isDisabled} onClick={handleClick}>connect Metamask</Button>
   } else {
     return <Button disabled={true}>connected: <Address clickable={false}>{address}</Address></Button>;
   }
