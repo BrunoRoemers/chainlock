@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "compile": "hardhat compile",
-    "test": "hardhat test"
+    "tests": "hardhat test"
   },
   "author": "",
   "license": "ISC",
