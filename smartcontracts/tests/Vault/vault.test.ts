@@ -142,5 +142,27 @@ describe("Vault", () => {
           .true;
       });
     });
+
+    describe("getOwnEncryptedPrivateKey", () => {
+      it("member should access own encrypted private key", async () => {
+        expect(
+          await vaultContract.connect(member1).getOwnEncryptedPrivateKey()
+        ).to.equal("fakePrivKey");
+      });
+
+      it("pending member does not have encrypted private key", async () => {
+        expect(
+          await vaultContract
+            .connect(pendingMember1)
+            .getOwnEncryptedPrivateKey()
+        ).to.equal("");
+      });
+
+      it("outsider does not have encrypted private key", async () => {
+        expect(
+          await vaultContract.connect(outsider1).getOwnEncryptedPrivateKey()
+        ).to.equal("");
+      });
+    });
   });
 });
