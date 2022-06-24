@@ -10,7 +10,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version-file: '.node-version'
-      - name: Install dependencies
+          cache: 'npm'
+          cache-dependency-path: ./smartcontracts/package-lock.json
+      - name: Install Dependencies
         working-directory: ./smartcontracts
         run: npm install
       - name: Run Hardhat Tests
