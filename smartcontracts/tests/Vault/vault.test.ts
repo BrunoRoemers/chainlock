@@ -64,7 +64,7 @@ describe("Vault", () => {
     });
   });
 
-  describe("isMember", () => {
+  describe("with members, pending members and outsiders", () => {
     let member1: SignerWithAddress;
     let pendingMember1: SignerWithAddress;
     let outsider1: SignerWithAddress;
@@ -86,72 +86,61 @@ describe("Vault", () => {
       outsider1 = signers[2];
     });
 
-    it("returns false when address is an outsider", async () => {
-      expect(await vaultContract.isMember(await outsider1.getAddress())).to.be
-        .false;
+    describe("isMember", () => {
+      it("returns false when address is an outsider", async () => {
+        expect(await vaultContract.isMember(await outsider1.getAddress())).to.be
+          .false;
+      });
+
+      it("returns false when address is a pending member", async () => {
+        expect(await vaultContract.isMember(await pendingMember1.getAddress()))
+          .to.be.false;
+      });
+
+      it("returns true when address is a member", async () => {
+        expect(await vaultContract.isMember(await member1.getAddress())).to.be
+          .true;
+      });
     });
 
-    it("returns false when address is a pending member", async () => {
-      expect(await vaultContract.isMember(await pendingMember1.getAddress())).to
-        .be.false;
-    });
+    describe("joinVault", () => {
+      it("pending member should be able to join vault", async () => {
+        expect(await vaultContract.isMember(await pendingMember1.getAddress()))
+          .to.be.false;
 
-    it("returns true when address is a member", async () => {
-      expect(await vaultContract.isMember(await member1.getAddress())).to.be
-        .true;
-    });
-  });
+        await vaultContract
+          .connect(pendingMember1)
+          .joinVault("fakePrivKey", "fakePubKey");
 
-  describe("joinVault", () => {
-    let member1: SignerWithAddress;
-    let pendingMember1: SignerWithAddress;
-    let outsider1: SignerWithAddress;
+        expect(await vaultContract.isMember(await pendingMember1.getAddress()))
+          .to.be.true;
+      });
 
-    beforeEach(async () => {
-      // member 1
-      member1 = deployer;
-      await vaultContract
-        .connect(deployer)
-        .joinVault("fakePrivKey", "fakePubKey");
+      it("outsider should NOT be able to join vault", async () => {
+        expect(await vaultContract.isMember(await outsider1.getAddress())).to.be
+          .false;
 
-      // pending member 1
-      pendingMember1 = signers[1];
-      await vaultContract
-        .connect(member1)
-        .addPendingMember(await pendingMember1.getAddress());
+        await expect(
+          vaultContract
+            .connect(outsider1)
+            .joinVault("fakePrivKey", "fakePubKey")
+        ).to.be.revertedWith("not a pending member");
 
-      // outsider 1
-      outsider1 = signers[2];
-    });
+        expect(await vaultContract.isMember(await outsider1.getAddress())).to.be
+          .false;
+      });
 
-    it("pending member should be able to join vault", async () => {
-      expect(await vaultContract.isMember(await pendingMember1.getAddress())).to.be.false;
+      it("member should NOT be able to join vault again", async () => {
+        expect(await vaultContract.isMember(await member1.getAddress())).to.be
+          .true;
 
-      await vaultContract
-        .connect(pendingMember1)
-        .joinVault("fakePrivKey", "fakePubKey");
+        await expect(
+          vaultContract.connect(member1).joinVault("fakePrivKey", "fakePubKey")
+        ).to.be.revertedWith("not a pending member");
 
-      expect(await vaultContract.isMember(await pendingMember1.getAddress())).to.be.true;
-    });
-
-    it("outsider should NOT be able to join vault", async () => {
-      expect(await vaultContract.isMember(await outsider1.getAddress())).to.be.false;
-
-      await expect(
-        vaultContract.connect(outsider1).joinVault("fakePrivKey", "fakePubKey")
-      ).to.be.revertedWith("not a pending member");
-
-      expect(await vaultContract.isMember(await outsider1.getAddress())).to.be.false;
-    });
-
-    it("member should NOT be able to join vault again", async () => {
-      expect(await vaultContract.isMember(await member1.getAddress())).to.be.true;
-
-      await expect(
-        vaultContract.connect(member1).joinVault("fakePrivKey", "fakePubKey")
-      ).to.be.revertedWith("not a pending member");
-
-      expect(await vaultContract.isMember(await member1.getAddress())).to.be.true;
+        expect(await vaultContract.isMember(await member1.getAddress())).to.be
+          .true;
+      });
     });
   });
 });
