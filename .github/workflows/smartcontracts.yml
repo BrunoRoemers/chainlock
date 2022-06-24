@@ -10,6 +10,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version-file: '.node-version'
+      - name: Install dependencies
+        working-directory: ./smartcontracts
+        run: npm install
       - name: Run Hardhat Tests
         working-directory: ./smartcontracts
         run: npm run tests
