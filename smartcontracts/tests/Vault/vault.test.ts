@@ -66,6 +66,7 @@ describe("Vault", () => {
 
   describe("with members, pending members and outsiders", () => {
     let member1: SignerWithAddress;
+    let member2: SignerWithAddress;
     let pendingMember1: SignerWithAddress;
     let outsider1: SignerWithAddress;
 
@@ -76,14 +77,23 @@ describe("Vault", () => {
         .connect(deployer)
         .joinVault("fakePrivKey", "fakePubKey");
 
+      // member 2
+      member2 = signers[1];
+      await vaultContract
+        .connect(member1)
+        .addPendingMember(await member2.getAddress());
+      await vaultContract
+        .connect(member2)
+        .joinVault("fakePrivKey2", "fakePubKey2");
+
       // pending member 1
-      pendingMember1 = signers[1];
+      pendingMember1 = signers[2];
       await vaultContract
         .connect(member1)
         .addPendingMember(await pendingMember1.getAddress());
 
       // outsider 1
-      outsider1 = signers[2];
+      outsider1 = signers[3];
     });
 
     describe("isMember", () => {
@@ -151,17 +161,49 @@ describe("Vault", () => {
       });
 
       it("pending member does not have encrypted private key", async () => {
-        expect(
-          await vaultContract
-            .connect(pendingMember1)
-            .getOwnEncryptedPrivateKey()
-        ).to.equal("");
+        await expect(
+          vaultContract.connect(pendingMember1).getOwnEncryptedPrivateKey()
+        ).to.be.revertedWith("not a member");
       });
 
       it("outsider does not have encrypted private key", async () => {
+        await expect(
+          vaultContract.connect(outsider1).getOwnEncryptedPrivateKey()
+        ).to.be.revertedWith("not a member");
+      });
+    });
+
+    describe("getPublicKey", () => {
+      it("member should access own public key", async () => {
         expect(
-          await vaultContract.connect(outsider1).getOwnEncryptedPrivateKey()
-        ).to.equal("");
+          await vaultContract
+            .connect(member1)
+            .getPublicKey(await member1.getAddress())
+        ).to.equal("fakePubKey");
+      });
+
+      it("member should access public key of other member", async () => {
+        expect(
+          await vaultContract
+            .connect(member1)
+            .getPublicKey(await member2.getAddress())
+        ).to.equal("fakePubKey2");
+      });
+
+      it("pending member should not access public key of member", async () => {
+        await expect(
+          vaultContract
+            .connect(pendingMember1)
+            .getPublicKey(await member1.getAddress())
+        ).to.be.revertedWith("not a member");
+      });
+
+      it("outsider should not access public key of member", async () => {
+        await expect(
+          vaultContract
+            .connect(outsider1)
+            .getPublicKey(await member1.getAddress())
+        ).to.be.revertedWith("not a member");
       });
     });
   });

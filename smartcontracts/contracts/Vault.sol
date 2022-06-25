@@ -69,11 +69,11 @@ contract Vault {
     members[msg.sender] = Member(encryptedPrivateKey, publicKey, new uint[](0));
   }
 
-  function getOwnEncryptedPrivateKey() external view returns(string memory) {
+  function getOwnEncryptedPrivateKey() external view onlyMember returns(string memory) {
     return members[msg.sender].encryptedPrivateKey;
   }
 
-  function getPublicKey(address addr) external view returns(string memory) {
+  function getPublicKey(address addr) external view onlyMember returns(string memory) {
     return members[addr].publicKey;
   }
 
