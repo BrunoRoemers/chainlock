@@ -9,6 +9,7 @@ export default class MetamaskWallet implements Wallet {
     private mm: RawMetamask
   ) {}
 
+  
   async requestAddressAccess(): Promise<string | undefined> {
     const r = await this.mm.request({ method: 'eth_requestAccounts' })
     return r.length <= 0 ? undefined : r[0]
@@ -74,9 +75,33 @@ export default class MetamaskWallet implements Wallet {
     return Promise.resolve(message);
   }
 
+  async createTransaction(address: string, rawData: string): Promise<string> {
+    const transactionParameters = {
+      nonce: '0x00', // ignored by MetaMask
+      // gasPrice: '0x09184e72a000', // customizable by user during MetaMask confirmation.
+      // gas: '0x2710', // customizable by user during MetaMask confirmation.
+      to: '0x5C58D62b1485e1c8C774dca115409d58e78e7B23', // Required except during contract publications.
+      from: address, // must match user's active address.
+      // value: '0x00', // Only required to send ether to the recipient from the initiating external account.
+      data: rawData, // Optional, but used for defining smart contract creation and interaction.
+      // chainId: '0x3', // Used to prevent transaction reuse across blockchains. Auto-filled by MetaMask.
+    };
+    
+    // txHash is a hex string
+    // As with any RPC call, it may throw an error
+    const txHash: string = await this.mm.request({
+      method: 'eth_sendTransaction',
+      params: [transactionParameters],
+      
+    });
+
+    return txHash;
+
+  }
 
   getMetamaskObj(): RawMetamask {
     return this.mm;
   }
+  
 
 }

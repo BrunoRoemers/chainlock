@@ -35,5 +35,8 @@ export default interface Wallet {
 
   // TODO
   decryptWithPrivateKey(address: string, encryptedData: EthEncryptedData): Promise<string>;
+
+  // TODO
+  createTransaction(address: string, rawData: string): Promise<string>;
   
 }
