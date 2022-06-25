@@ -15,6 +15,9 @@ jobs:
       - name: Install Dependencies
         working-directory: ./smartcontracts
         run: npm install
+      - name: Generate TS Types for Smartcontracts
+        working-directory: ./smartcontracts
+        run: npx hardhat typechain
       - name: Run Hardhat Tests
         working-directory: ./smartcontracts
-        run: npm run tests
+        run: npx hardhat test
