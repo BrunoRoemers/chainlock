@@ -1,5 +1,8 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
+import { assert } from "console";
+import { BigNumber } from "ethers";
+import { AbiCoder, ParamType } from "ethers/lib/utils";
 import { ethers } from "hardhat";
 // eslint-disable-next-line node/no-missing-import
 import { Vault } from "../../typechain";
@@ -44,6 +47,8 @@ describe("Vault", () => {
       await vaultContract.connect(deployer).addPendingMember(selfAddress);
       expect(await vaultContract.pendingMembers(selfAddress)).to.be.true;
     });
+
+    // TODO refactor tests: pending member and outsider
 
     it("non-member should NOT be able to add a new pending member", async () => {
       const newAddress = await signers[2].getAddress();
@@ -206,5 +211,98 @@ describe("Vault", () => {
         ).to.be.revertedWith("not a member");
       });
     });
-  });
+
+    describe("createAccount", () => {
+      it("outsider should NOT be able to create an account", async () => {
+        await expect(
+          vaultContract.connect(outsider1).createAccount("twitter 1")
+        ).to.be.revertedWith("not a member");
+
+        // no account has been created
+        await expect(vaultContract.connect(member1).accounts(0)).to.be.reverted;
+      });
+
+      it("pending member should NOT be able to create an account", async () => {
+        await expect(
+          vaultContract.connect(pendingMember1).createAccount("twitter 1")
+        ).to.be.revertedWith("not a member");
+
+        // no account has been created
+        await expect(vaultContract.connect(member1).accounts(0)).to.be.reverted;
+      });
+
+      it("member should be able to create one account", async () => {
+        await expect(vaultContract.connect(member1).createAccount("twitter 1"))
+          .to.emit(vaultContract, "AccountCreated")
+          .withArgs(await member1.getAddress(), 0);
+
+        expect(await vaultContract.connect(member1).accounts(0)).to.be.equal(
+          "twitter 1"
+        );
+      });
+
+      it("member should be able to create three accounts", async () => {
+        await expect(vaultContract.connect(member1).createAccount("twitter"))
+          .to.emit(vaultContract, "AccountCreated")
+          .withArgs(await member1.getAddress(), 0);
+
+        await expect(vaultContract.connect(member1).createAccount("gmail"))
+          .to.emit(vaultContract, "AccountCreated")
+          .withArgs(await member1.getAddress(), 1);
+
+        await expect(vaultContract.connect(member1).createAccount("facebook"))
+          .to.emit(vaultContract, "AccountCreated")
+          .withArgs(await member1.getAddress(), 2);
+
+        expect(await vaultContract.connect(member1).accounts(0)).to.be.equal(
+          "twitter"
+        );
+
+        expect(await vaultContract.connect(member1).accounts(1)).to.be.equal(
+          "gmail"
+        );
+
+        expect(await vaultContract.connect(member1).accounts(2)).to.be.equal(
+          "facebook"
+        );
+      });
+
+      it("should be able to create multiple accounts with the same identifier", async () => {
+        await expect(vaultContract.connect(member1).createAccount("twitter"))
+          .to.emit(vaultContract, "AccountCreated")
+          .withArgs(await member1.getAddress(), 0);
+
+        await expect(vaultContract.connect(member1).createAccount("twitter"))
+          .to.emit(vaultContract, "AccountCreated")
+          .withArgs(await member1.getAddress(), 1);
+
+        expect(await vaultContract.connect(member1).accounts(0)).to.be.equal(
+          "twitter"
+        );
+
+        expect(await vaultContract.connect(member1).accounts(1)).to.be.equal(
+          "twitter"
+        );
+      });
+    });
+
+  // TODO
+  //   describe("storeSecret", () => {
+  //     it("outsider should NOT be able to store a secret for themselves", async () => {
+  //       await expect(
+  //         vaultContract.connect(outsider1).storeSecret(outsider1)
+  //       ).to.be.revertedWith("not a member");
+  //     });
+
+  //     it("outsider should NOT be able to store a secret for a member", async () => {});
+
+  //     it("pending member should NOT be able to store a secret for themselves", async () => {});
+
+  //     it("pending member should NOT be able to store a secret for a member", async () => {});
+
+  //     it("member should be able to store a secret for themselves", async () => {});
+
+  //     it("member should be able to store a secret for other member", async () => {});
+  //   });
+  // });
 });

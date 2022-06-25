@@ -5,13 +5,21 @@ import "hardhat/console.sol";
 
 contract Vault {
 
+  event AccountCreated(address creator, uint accountId);
+
+  event SecretStored(address creator, uint secretId);
+
   struct Member {
     string encryptedPrivateKey;
     string publicKey;
-    uint[] passwords;
+    uint[] secretIds;
   }
 
-  struct Password {
+  struct Account {
+    string identifier;
+  }
+
+  struct Secret {
     string encryptedUsername;
     string encryptedPassword;
   }
@@ -24,18 +32,26 @@ contract Vault {
   /**
    All members currently in the vault, their private key, public key and passwords
    */
-  mapping(address => Member) members;
+  mapping(address => Member) public members;
 
   /**
-   All passwords currently in the vault.
-   NOTE: the same password may be encrypted multiple times (for different members).
+   All secrets currently in the vault.
+   NOTE: the same password may be encrypted multiple times (for different members), resulting in multiple secrets.
    */
-  Password[] passwords;
+  Secret[] public secrets;
 
   /**
-   Group passwords that belong to the same account together.
+   All accounts currently in the vault.
+   E.g. Twiter, Gmail, webhosting...
+   NOTE: no duplicate check on the identifiers.
    */
-  mapping(string => Password[]) passwordsByAccount;
+  Account[] public accounts;
+
+  /**
+   Group all members by account.
+   Given the accounts in your vault, you can look up who else has access to that account.
+   */
+  mapping(uint => address[]) public membersByAccount;
 
   constructor() {
     // the creator of the contract needs to be a pending member to bootstrap the vault
@@ -77,14 +93,42 @@ contract Vault {
     return members[addr].publicKey;
   }
 
+  /**
+   Create the account and return the account id.
+   */
+  function createAccount(
+    string calldata identifier
+  ) external onlyMember returns(uint) {
+    accounts.push(Account(identifier));
+    uint accountId = accounts.length - 1;
+    emit AccountCreated(msg.sender, accountId);
+    return accountId;
+  }
+
   // TODO
-  // function storePassword(string label, string ) {
+  // // NOTE: every member can store a secret for another member
+  // function storeSecret(
+  //   address member,
+  //   uint accountId,
+  //   string calldata encryptedUsername,
+  //   string calldata encryptedPassword
+  // ) external onlyMember {
+  //   // TODO
   //   // create password
-  //   passwords.push(Password())
+  //   // passwords.push(Password())
     
   //   // add password to member
 
   //   // add password to label
+  // }
+
+  // // NOTE: any member can only remove secrets belonging to themselves
+  // function removeSecret(
+  //   uint accountId
+  // ) external onlyMember {
+
+  //   // TODO unlinking is good enough for now,
+  //   //      but how can we actually remove an element from the Secrets array?
   // }
   
 }
