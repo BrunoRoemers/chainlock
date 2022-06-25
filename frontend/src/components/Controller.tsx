@@ -39,7 +39,10 @@ const Controller = () => {
 
   if (vaultAddresses.length <= 0) {
     return (
-      <FirstVault/>
+      <FirstVault
+        wallet={wallet}
+        connectedAddress={address}
+      />
     )
   }
 
