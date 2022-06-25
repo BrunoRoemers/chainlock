@@ -4,9 +4,11 @@ interface Props {
 
 const Frame = ({children}: Props) => {
   return (
-    <div className="h-full flex justify-center items-center p-4">
-      <div className="grow max-w-full sm:max-w-md bg-pink-100 rounded-lg p-4">
-        {children}
+    <div className="h-full align-center">
+      <div className="flex items-center align-center p-0">
+        <div className="pt-20">
+          {children}
+        </div>
       </div>
     </div>
   )
