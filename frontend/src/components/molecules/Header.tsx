@@ -13,7 +13,7 @@ const Header = ({walletAddress, onDisconnectWallet, vaultAddress, onChangeVault}
   return (
     <div className="flex items-center bg-gray-800 text-white p-2">
       <div className="pr-2">
-        <FrameLogo/>
+        <p className="text-2xl font-bold pl-10">CHAINLOCK</p>
       </div>
       <div className="grow flex justify-end">
         <div>

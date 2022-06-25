@@ -28,10 +28,10 @@ const useVaultAddresses = (wallet: Wallet | undefined, address: string | undefin
       } else {
         setVaultAddresses([
           // TODO some addresses that everyone can see...
-          '0x6d6faa770073810629c63729a6e428c46b9e0cd4',
-          '0xb05b34b3ca20660ee00e679c9ab20c09eb4e68a1',
-          '0x07721f699a1f434983b2c15db719e6d235ba936e',
-          '0x32c0edf1a4d69db492b17341764d041ddb643016'
+          //'0x6d6faa770073810629c63729a6e428c46b9e0cd4',
+          //'0xb05b34b3ca20660ee00e679c9ab20c09eb4e68a1',
+          //'0x07721f699a1f434983b2c15db719e6d235ba936e',
+          //'0x32c0edf1a4d69db492b17341764d041ddb643016'
         ])
       }
     }
