@@ -5,6 +5,7 @@ import Frame from "../atoms/Frame"
 import FrameLogo from "../atoms/FrameLogo"
 import FrameMessage from "../atoms/FrameMessage"
 import WalletButton from "../molecules/WalletButton"
+import vaultImage from "../../images/vault.png"
 
 interface Props {
   wallet: Wallet
@@ -27,29 +28,44 @@ const ConnectMetamask = ({wallet, connectedAddress, onConnect}: Props) => {
   console.log('availableAddress', availableAddress)
 
   return (
-    <Frame>
-      <FrameLogo/>
-      <FrameMessage>
-        <WalletButton
-          wallet={wallet}
-          connectedAddress={connectedAddress}
-          availableAddress={availableAddress}
-          onConnect={onConnect}
-        />
-        {!connectedAddress && availableAddress && (
-          <>
-            <p className="mt-2 text-gray-600 text-sm">
-              Since you have connected to Chainlock before, Metamask will automatically connect to address <Address>{availableAddress}</Address> when you click the button above.
-            </p>
-            <p className="mt-2 text-gray-600 text-sm">To use a different address, open Metamask and select the address you want to use.
-              In the top-left corner of the Metamask window, you'll see "connected" if you have used this address in Chainlock before,
-              or "disconnected" if you haven't used this address in Chainlock yet. Use these buttons to connect new addresses and/or
-              revoke permissions on previous addresses.
-            </p>
-          </>
-        )}
-      </FrameMessage>
-    </Frame>
+    <div className="container-index h-screen">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-2 h-screen">
+        <div className="justify-center pl-20 pr-10 pt-20 sm:pt-40">
+          <div className="">
+            <p className="font-bold text-5xl text-[#333]">Chainlock</p>
+            <p className="font-medium text-[#333] text-l mt-10">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. </p>
+            <p className="font-medium  text-[#333] text-l mt-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+          </div>
+          <div className="mt-0">
+            <Frame>
+              <FrameMessage>
+                <WalletButton
+                wallet={wallet}
+                connectedAddress={connectedAddress}
+                availableAddress={availableAddress}
+                onConnect={onConnect}
+                />
+                {!connectedAddress && availableAddress && (
+                <>
+                <p className="mt-2 text-gray-600 text-sm">
+                  Since you have connected to Chainlock before, Metamask will automatically connect to address <Address>{availableAddress}</Address> when you click the button above.
+                </p>
+                <p className="mt-2 text-gray-600 text-sm">To use a different address, open Metamask and select the address you want to use.
+                  In the top-left corner of the Metamask window, you'll see "connected" if you have used this address in Chainlock before,
+                  or "disconnected" if you haven't used this address in Chainlock yet. Use these buttons to connect new addresses and/or
+                  revoke permissions on previous addresses.
+                </p>
+                </>
+                )}
+              </FrameMessage>
+            </Frame>
+          </div>
+        </div>
+        <div className="img-background flex justify-center pt-10 hidden md:block">
+          <img className="px-40 pt-0 md:p-20 drop-shadow-6xl" src={vaultImage} />
+        </div>
+        </div>
+    </div>
   )
 }
 

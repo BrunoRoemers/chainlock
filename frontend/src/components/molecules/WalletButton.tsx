@@ -37,7 +37,7 @@ const WalletButton = ({ wallet, connectedAddress, availableAddress, onConnect }:
   }
   
   // the user has never connected before
-  return <Button onClick={handleClick}>connect Metamask</Button>
+  return <Button onClick={handleClick}>Connect wallet</Button>
 }
 
 export default WalletButton

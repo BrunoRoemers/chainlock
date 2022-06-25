@@ -4,7 +4,7 @@ interface Props {
 
 const FrameMessage = ({children}: Props) => {
   return (
-    <div className="pt-4 text-center">{children}</div>
+    <div className="pt-4">{children}</div>
   )
 }
 

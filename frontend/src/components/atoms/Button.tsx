@@ -2,13 +2,14 @@ import { ButtonHTMLAttributes } from "react";
 
 // exported as array for easier manipulation
 export const defaultClassNames = [
-  'bg-blue-600',
+  'bg-[#2b3f4a]',
   'text-white',
-  'px-2',
-  'py-1',
-  'rounded-md',
-  'hover:bg-blue-500',
-  'disabled:bg-gray-500'
+  'px-12',
+  'py-4',
+  'rounded-xl',
+  'hover:scale-105',
+  'disabled:bg-gray-500',
+  'ease-in duration-200'
 ]
 
 interface Props extends React.DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> {}
