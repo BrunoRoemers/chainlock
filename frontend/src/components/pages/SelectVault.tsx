@@ -1,3 +1,4 @@
+import { SocketAddress } from "net"
 import Address from "../atoms/Address"
 import Frame from "../atoms/Frame"
 import FrameLogo from "../atoms/FrameLogo"
@@ -9,7 +10,7 @@ interface Props {
   onSelect?: (vaultAddress: string) => void
 }
 
-const CHOOSE_A_VAULT = 'choose a vault...'
+const CHOOSE_A_VAULT = 'Select vault'
 
 const SelectVault = ({address, vaultAddresses, onSelect}: Props) => {
   const onChange: React.ChangeEventHandler<HTMLSelectElement> = (e) => {
@@ -19,15 +20,21 @@ const SelectVault = ({address, vaultAddresses, onSelect}: Props) => {
   }
 
   return (
-    <Frame>
-      <FrameLogo/>
+    <div className="bg-[#2b3f4a] text-white h-screen text-center pt-20">
+      <div className="">
+        <div>
+        <p className="text-5xl mb">Hello 👋</p>
+          <p className="text-2xl mt-6">Select the vault you want to use</p>
+          <p className="mt-2 text-sm text-slate-300">Next, Metamask will ask you to decrypt the vault.</p>
+        </div>
+      </div>
+      <div className="mt-20 text-black  flex justify-center items-center">
+      <Frame>
       <FrameMessage>
-        <p>Hi, <Address named>{address}</Address> 👋</p>
-        <p className="mt-2">Select which vault to use:</p>
         <select
-          className="mt-6 bg-white rounded-md px-2 py-1 min-w-[50%] max-w-full font-mono"
-          onChange={onChange}
+          className="mb-4 bg-white rounded-md px-2 py-1 min-w-[50%] max-w-full font-mono"
           defaultValue={CHOOSE_A_VAULT}
+          onChange={onChange}
         >
           <option disabled={true}>{CHOOSE_A_VAULT}</option>
           {vaultAddresses.map(vaultAddress => (
@@ -36,9 +43,13 @@ const SelectVault = ({address, vaultAddresses, onSelect}: Props) => {
             </option>
           ))}
         </select>
-        <p className="mt-6 text-gray-600">Next, Metamask will ask you to decrypt the vault.</p>
       </FrameMessage>
     </Frame>
+      </div>
+      <div className="">
+        <p className=""><Address named>{address}</Address></p>
+      </div>
+  </div>
   )
 }
 
