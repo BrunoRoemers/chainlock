@@ -1,5 +1,6 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
+import { BigNumber } from "ethers";
 import { ethers } from "hardhat";
 // eslint-disable-next-line node/no-missing-import
 import { Vault } from "../../typechain";
@@ -13,7 +14,9 @@ describe("Vault", () => {
     signers = await ethers.getSigners();
     deployer = signers[0];
     const vaultFactory = await ethers.getContractFactory("Vault");
-    vaultContract = await vaultFactory.connect(deployer).deploy(await deployer.getAddress());
+    vaultContract = await vaultFactory
+      .connect(deployer)
+      .deploy(await deployer.getAddress());
     await vaultContract.deployed();
   });
 
@@ -52,7 +55,7 @@ describe("Vault", () => {
       expect(await vaultContract.pendingMembers(newAddress)).to.be.false;
       await expect(
         vaultContract.connect(signers[1]).addPendingMember(newAddress)
-      ).to.be.revertedWith("not a member");
+      ).to.be.revertedWith("sender not a member");
       expect(await vaultContract.pendingMembers(newAddress)).to.be.false;
     });
 
@@ -61,7 +64,7 @@ describe("Vault", () => {
       expect(await vaultContract.pendingMembers(selfAddress)).to.be.false;
       await expect(
         vaultContract.connect(signers[1]).addPendingMember(selfAddress)
-      ).to.be.revertedWith("not a member");
+      ).to.be.revertedWith("sender not a member");
       expect(await vaultContract.pendingMembers(selfAddress)).to.be.false;
     });
   });
@@ -136,7 +139,7 @@ describe("Vault", () => {
           vaultContract
             .connect(outsider1)
             .joinVault("fakePrivKey", "fakePubKey")
-        ).to.be.revertedWith("not a pending member");
+        ).to.be.revertedWith("sender not a pending member");
 
         expect(await vaultContract.isMember(await outsider1.getAddress())).to.be
           .false;
@@ -148,7 +151,7 @@ describe("Vault", () => {
 
         await expect(
           vaultContract.connect(member1).joinVault("fakePrivKey", "fakePubKey")
-        ).to.be.revertedWith("not a pending member");
+        ).to.be.revertedWith("sender not a pending member");
 
         expect(await vaultContract.isMember(await member1.getAddress())).to.be
           .true;
@@ -165,13 +168,13 @@ describe("Vault", () => {
       it("pending member does not have encrypted private key", async () => {
         await expect(
           vaultContract.connect(pendingMember1).getOwnEncryptedPrivateKey()
-        ).to.be.revertedWith("not a member");
+        ).to.be.revertedWith("sender not a member");
       });
 
       it("outsider does not have encrypted private key", async () => {
         await expect(
           vaultContract.connect(outsider1).getOwnEncryptedPrivateKey()
-        ).to.be.revertedWith("not a member");
+        ).to.be.revertedWith("sender not a member");
       });
     });
 
@@ -197,7 +200,7 @@ describe("Vault", () => {
           vaultContract
             .connect(pendingMember1)
             .getPublicKey(await member1.getAddress())
-        ).to.be.revertedWith("not a member");
+        ).to.be.revertedWith("sender not a member");
       });
 
       it("outsider should not access public key of member", async () => {
@@ -205,7 +208,7 @@ describe("Vault", () => {
           vaultContract
             .connect(outsider1)
             .getPublicKey(await member1.getAddress())
-        ).to.be.revertedWith("not a member");
+        ).to.be.revertedWith("sender not a member");
       });
     });
 
@@ -213,7 +216,7 @@ describe("Vault", () => {
       it("outsider should NOT be able to create an account", async () => {
         await expect(
           vaultContract.connect(outsider1).createAccount("twitter 1")
-        ).to.be.revertedWith("not a member");
+        ).to.be.revertedWith("sender not a member");
 
         // no account has been created
         await expect(vaultContract.connect(member1).accounts(0)).to.be.reverted;
@@ -222,7 +225,7 @@ describe("Vault", () => {
       it("pending member should NOT be able to create an account", async () => {
         await expect(
           vaultContract.connect(pendingMember1).createAccount("twitter 1")
-        ).to.be.revertedWith("not a member");
+        ).to.be.revertedWith("sender not a member");
 
         // no account has been created
         await expect(vaultContract.connect(member1).accounts(0)).to.be.reverted;
@@ -283,23 +286,294 @@ describe("Vault", () => {
       });
     });
 
-    // TODO
-    //   describe("storeSecret", () => {
-    //     it("outsider should NOT be able to store a secret for themselves", async () => {
-    //       await expect(
-    //         vaultContract.connect(outsider1).storeSecret(outsider1)
-    //       ).to.be.revertedWith("not a member");
-    //     });
+    describe("with accounts", () => {
+      const account1 = "account 1";
+      const account2 = "account 2";
+      const account3 = "account 3";
 
-    //     it("outsider should NOT be able to store a secret for a member", async () => {});
+      beforeEach(async () => {
+        await vaultContract.connect(member1).createAccount(account1);
+        await vaultContract.connect(member1).createAccount(account2);
+        await vaultContract.connect(member2).createAccount(account3);
+      });
 
-    //     it("pending member should NOT be able to store a secret for themselves", async () => {});
+      describe("storeSecret", () => {
+        const verifySecretStateNotChanged = async () => {
+          // verify secret not created
+          await expect(vaultContract.secrets(0)).to.be.reverted;
 
-    //     it("pending member should NOT be able to store a secret for a member", async () => {});
+          // verify secret not added to members
+          expect(
+            await vaultContract.connect(member1).getOwnSecretIds()
+          ).to.deep.equal([]);
+          expect(
+            await vaultContract.connect(member2).getOwnSecretIds()
+          ).to.deep.equal([]);
 
-    //     it("member should be able to store a secret for themselves", async () => {});
+          // verify secret not added to accounts
+          expect(await vaultContract.getMembersByAccountId(0)).to.deep.eq([]);
+          expect(await vaultContract.getMembersByAccountId(1)).to.deep.eq([]);
+          expect(await vaultContract.getMembersByAccountId(2)).to.deep.eq([]);
+          expect(await vaultContract.getMembersByAccountId(3)).to.deep.eq([]);
+        };
 
-    //     it("member should be able to store a secret for other member", async () => {});
-    //   });
+        it("outsider should NOT be able to store a secret for themselves", async () => {
+          await expect(
+            vaultContract
+              .connect(outsider1)
+              .storeSecret(
+                await outsider1.getAddress(),
+                0,
+                "encryptedUsername",
+                "encryptedPassword"
+              )
+          ).to.be.revertedWith("sender not a member");
+
+          await verifySecretStateNotChanged();
+        });
+
+        it("outsider should NOT be able to store a secret for a member", async () => {
+          await expect(
+            vaultContract
+              .connect(outsider1)
+              .storeSecret(
+                await member1.getAddress(),
+                0,
+                "encryptedUsername",
+                "encryptedPassword"
+              )
+          ).to.be.revertedWith("sender not a member");
+
+          await verifySecretStateNotChanged();
+        });
+
+        it("pending member should NOT be able to store a secret for themselves", async () => {
+          await expect(
+            vaultContract
+              .connect(pendingMember1)
+              .storeSecret(
+                await pendingMember1.getAddress(),
+                0,
+                "encryptedUsername",
+                "encryptedPassword"
+              )
+          ).to.be.revertedWith("sender not a member");
+
+          await verifySecretStateNotChanged();
+        });
+
+        it("pending member should NOT be able to store a secret for a member", async () => {
+          await expect(
+            vaultContract
+              .connect(pendingMember1)
+              .storeSecret(
+                await member1.getAddress(),
+                0,
+                "encryptedUsername",
+                "encryptedPassword"
+              )
+          ).to.be.revertedWith("sender not a member");
+
+          await verifySecretStateNotChanged();
+        });
+
+        it("member should be able to store a secret for themselves", async () => {
+          await expect(
+            vaultContract
+              .connect(member1)
+              .storeSecret(
+                await member1.getAddress(),
+                2,
+                "encryptedUsername123",
+                "encryptedPassword456"
+              )
+          )
+            .to.emit(vaultContract, "SecretCreated")
+            .withArgs(
+              await member1.getAddress(),
+              await member1.getAddress(),
+              2, // account id
+              0 // secret id
+            );
+
+          // verify secret
+          const secret1 = await vaultContract.secrets(0);
+          expect(secret1.encryptedUsername).to.eq("encryptedUsername123");
+          expect(secret1.encryptedPassword).to.eq("encryptedPassword456");
+
+          await expect(vaultContract.secrets(1)).to.be.reverted;
+
+          // verify member
+          expect(
+            await vaultContract.connect(member1).getOwnSecretIds()
+          ).to.deep.equal([
+            BigNumber.from(0), // secret id
+          ]);
+
+          // verify accounts
+          expect(await vaultContract.getMembersByAccountId(0)).to.deep.eq([]);
+          expect(await vaultContract.getMembersByAccountId(1)).to.deep.eq([]);
+          expect(await vaultContract.getMembersByAccountId(2)).to.deep.eq([
+            await member1.getAddress(),
+          ]);
+          expect(await vaultContract.getMembersByAccountId(3)).to.deep.eq([]);
+        });
+
+        it("member should be able to store a secret for other member", async () => {
+          await expect(
+            vaultContract
+              .connect(member1)
+              .storeSecret(
+                await member2.getAddress(),
+                1,
+                "encryptedUsername123",
+                "encryptedPassword456"
+              )
+          )
+            .to.emit(vaultContract, "SecretCreated")
+            .withArgs(
+              await member1.getAddress(),
+              await member2.getAddress(),
+              1, // account id
+              0 // secret id
+            );
+
+          // verify secret
+          const secret1 = await vaultContract.secrets(0);
+          expect(secret1.encryptedUsername).to.eq("encryptedUsername123");
+          expect(secret1.encryptedPassword).to.eq("encryptedPassword456");
+
+          await expect(vaultContract.secrets(1)).to.be.reverted;
+
+          // verify member
+          expect(
+            await vaultContract.connect(member1).getOwnSecretIds()
+          ).to.deep.equal([]);
+          expect(
+            await vaultContract.connect(member2).getOwnSecretIds()
+          ).to.deep.equal([
+            BigNumber.from(0), // secret id
+          ]);
+
+          // verify accounts
+          expect(await vaultContract.getMembersByAccountId(0)).to.deep.eq([]);
+          expect(await vaultContract.getMembersByAccountId(1)).to.deep.eq([
+            await member2.getAddress(),
+          ]);
+          expect(await vaultContract.getMembersByAccountId(2)).to.deep.eq([]);
+          expect(await vaultContract.getMembersByAccountId(3)).to.deep.eq([]);
+        });
+
+        it("should be able to store multiple secrets for a member", async () => {
+          await expect(
+            vaultContract
+              .connect(member1)
+              .storeSecret(await member1.getAddress(), 1, "S.U.1", "S.P.1")
+          )
+            .to.emit(vaultContract, "SecretCreated")
+            .withArgs(
+              await member1.getAddress(),
+              await member1.getAddress(),
+              1, // account id
+              0 // secret id
+            );
+
+          await expect(
+            vaultContract
+              .connect(member2)
+              .storeSecret(await member1.getAddress(), 1, "S.U.2", "S.P.2")
+          )
+            .to.emit(vaultContract, "SecretCreated")
+            .withArgs(
+              await member2.getAddress(),
+              await member1.getAddress(),
+              1, // account id
+              1 // secret id
+            );
+
+          await expect(
+            vaultContract
+              .connect(member2)
+              .storeSecret(await member1.getAddress(), 2, "S.U.3", "S.P.3")
+          )
+            .to.emit(vaultContract, "SecretCreated")
+            .withArgs(
+              await member2.getAddress(),
+              await member1.getAddress(),
+              2, // account id
+              2 // secret id
+            );
+
+          // verify secret
+          const secret1 = await vaultContract.secrets(0);
+          expect(secret1.encryptedUsername).to.eq("S.U.1");
+          expect(secret1.encryptedPassword).to.eq("S.P.1");
+          const secret2 = await vaultContract.secrets(1);
+          expect(secret2.encryptedUsername).to.eq("S.U.2");
+          expect(secret2.encryptedPassword).to.eq("S.P.2");
+          const secret3 = await vaultContract.secrets(2);
+          expect(secret3.encryptedUsername).to.eq("S.U.3");
+          expect(secret3.encryptedPassword).to.eq("S.P.3");
+
+          await expect(vaultContract.secrets(3)).to.be.reverted;
+
+                // TODO cont here
+
+          // verify member
+          expect(
+            await vaultContract.connect(member1).getOwnSecretIds()
+          ).to.deep.equal([
+            BigNumber.from(0), // secret id
+            BigNumber.from(1), // secret id
+            BigNumber.from(2), // secret id
+          ]);
+          expect(
+            await vaultContract.connect(member2).getOwnSecretIds()
+          ).to.deep.equal([]);
+
+          // verify accounts
+          expect(await vaultContract.getMembersByAccountId(0)).to.deep.eq([]);
+          expect(await vaultContract.getMembersByAccountId(1)).to.deep.eq([
+            // TODO should be here only once, fix this bug later
+            await member1.getAddress(),
+            await member1.getAddress(),
+          ]);
+          expect(await vaultContract.getMembersByAccountId(2)).to.deep.eq([
+            await member1.getAddress(),
+          ]);
+          expect(await vaultContract.getMembersByAccountId(3)).to.deep.eq([]);
+        });
+
+        it("member should NOT be able to store a secret for pending member", async () => {
+          await expect(
+            vaultContract
+              .connect(member1)
+              .storeSecret(
+                await pendingMember1.getAddress(),
+                1,
+                "encryptedUsername123",
+                "encryptedPassword456"
+              )
+          ).to.be.revertedWith("recipient not a member");
+
+          await verifySecretStateNotChanged();
+        });
+
+        it("member should NOT be able to store a secret for outsider", async () => {
+          await expect(
+            vaultContract
+              .connect(member1)
+              .storeSecret(
+                await outsider1.getAddress(),
+                1,
+                "encryptedUsername123",
+                "encryptedPassword456"
+              )
+          ).to.be.revertedWith("recipient not a member");
+
+          await verifySecretStateNotChanged();
+        });
+      });
+    });
   });
 });

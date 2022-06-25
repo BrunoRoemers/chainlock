@@ -7,7 +7,7 @@ contract Vault {
 
   event AccountCreated(address creator, uint accountId);
 
-  event SecretStored(address creator, uint secretId);
+  event SecretCreated(address creator, address receiver, uint accountId, uint secretId);
 
   struct Member {
     string encryptedPrivateKey;
@@ -59,7 +59,7 @@ contract Vault {
   }
 
   modifier onlyPendingMember {
-    require(pendingMembers[msg.sender], "not a pending member");
+    require(pendingMembers[msg.sender], "sender not a pending member");
     _;
   }
 
@@ -69,7 +69,7 @@ contract Vault {
 
   modifier onlyMember {
     // address is a member if its public key is in the vault
-    require(isMember(msg.sender), "not a member");
+    require(isMember(msg.sender), "sender not a member");
     _;
   }
 
@@ -105,22 +105,40 @@ contract Vault {
     return accountId;
   }
 
-  // TODO
-  // // NOTE: every member can store a secret for another member
-  // function storeSecret(
-  //   address member,
-  //   uint accountId,
-  //   string calldata encryptedUsername,
-  //   string calldata encryptedPassword
-  // ) external onlyMember {
-  //   // TODO
-  //   // create password
-  //   // passwords.push(Password())
-    
-  //   // add password to member
+  // NOTE: every member can store a secret for another member
+  function storeSecret(
+    address member,
+    uint accountId,
+    string calldata encryptedUsername,
+    string calldata encryptedPassword
+  ) external onlyMember returns(uint) {
+    require(isMember(member), "recipient not a member");
+    require(accounts.length > accountId, "account does not exist");
 
-  //   // add password to label
-  // }
+    // create secret
+    secrets.push(Secret(encryptedUsername, encryptedPassword));
+    uint secretId = secrets.length - 1;
+
+    // add secret to member
+    members[member].secretIds.push(secretId);
+
+    // add member to account
+    // FIXME: this may add duplicates
+    membersByAccount[accountId].push(member);
+    
+    // emit event
+    emit SecretCreated(msg.sender, member, accountId, secretId);
+
+    return secretId;
+  }
+
+  function getOwnSecretIds() external view onlyMember returns(uint[] memory) {
+    return members[msg.sender].secretIds;
+  }
+
+  function getMembersByAccountId(uint accountId) external view onlyMember returns(address[] memory) {
+    return membersByAccount[accountId];
+  }
 
   // // NOTE: any member can only remove secrets belonging to themselves
   // function removeSecret(
