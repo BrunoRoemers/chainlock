@@ -53,9 +53,9 @@ contract Vault {
    */
   mapping(uint => address[]) public membersByAccount;
 
-  constructor() {
-    // the creator of the contract needs to be a pending member to bootstrap the vault
-    pendingMembers[msg.sender] = true;
+  constructor(address firstPendingMember) {
+    // we need one pending member to bootstrap the vault
+    pendingMembers[firstPendingMember] = true;
   }
 
   modifier onlyPendingMember {

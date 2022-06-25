@@ -1,8 +1,5 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
-import { assert } from "console";
-import { BigNumber } from "ethers";
-import { AbiCoder, ParamType } from "ethers/lib/utils";
 import { ethers } from "hardhat";
 // eslint-disable-next-line node/no-missing-import
 import { Vault } from "../../typechain";
@@ -16,7 +13,7 @@ describe("Vault", () => {
     signers = await ethers.getSigners();
     deployer = signers[0];
     const vaultFactory = await ethers.getContractFactory("Vault");
-    vaultContract = await vaultFactory.connect(deployer).deploy();
+    vaultContract = await vaultFactory.connect(deployer).deploy(await deployer.getAddress());
     await vaultContract.deployed();
   });
 
@@ -286,23 +283,23 @@ describe("Vault", () => {
       });
     });
 
-  // TODO
-  //   describe("storeSecret", () => {
-  //     it("outsider should NOT be able to store a secret for themselves", async () => {
-  //       await expect(
-  //         vaultContract.connect(outsider1).storeSecret(outsider1)
-  //       ).to.be.revertedWith("not a member");
-  //     });
+    // TODO
+    //   describe("storeSecret", () => {
+    //     it("outsider should NOT be able to store a secret for themselves", async () => {
+    //       await expect(
+    //         vaultContract.connect(outsider1).storeSecret(outsider1)
+    //       ).to.be.revertedWith("not a member");
+    //     });
 
-  //     it("outsider should NOT be able to store a secret for a member", async () => {});
+    //     it("outsider should NOT be able to store a secret for a member", async () => {});
 
-  //     it("pending member should NOT be able to store a secret for themselves", async () => {});
+    //     it("pending member should NOT be able to store a secret for themselves", async () => {});
 
-  //     it("pending member should NOT be able to store a secret for a member", async () => {});
+    //     it("pending member should NOT be able to store a secret for a member", async () => {});
 
-  //     it("member should be able to store a secret for themselves", async () => {});
+    //     it("member should be able to store a secret for themselves", async () => {});
 
-  //     it("member should be able to store a secret for other member", async () => {});
-  //   });
-  // });
+    //     it("member should be able to store a secret for other member", async () => {});
+    //   });
+  });
 });
